@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Login</title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --verde: #90a224;
+      --vermelho: #801815;
+      --amarelo: #FDC75F;
+      --preto: #000000;
+      --fonte-principal: Arial, sans-serif;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: var(--fonte-principal);
+      background-color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      min-height: 100vh;
+    }
+
+    .container {
+      background-color: #fff;
+      border: 5px solid var(--verde);
+      border-radius: 16px;
+      padding: 40px;
+      max-width: 600px;
+      width: 100%;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+      text-align: center;
+    }
+
+    h1 {
+      color: var(--vermelho);
+      font-size: 28px;
+      margin-bottom: 30px;
+    }
+
+    label {
+      display: block;
+      text-align: left;
+      font-weight: bold;
+      color: var(--preto);
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 2px solid var(--verde);
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    button {
+      background-color: var(--verde);
+      color: #fff;
+      border: none;
+      padding: 10px 20px;
+      font-size: 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin: 10px 5px;
+    }
+
+    button:hover {
+      background-color: #73811d;
+    }
+
+    #msg {
+      margin-top: 15px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+
+<body>
+  
+  <div class="container">
+    <h1>Login</h1>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" placeholder="Digite seu email" />
+
+    <label for="senha">Senha:</label>
+    <input type="password" id="senha" placeholder="Digite sua senha" />
+
+    <button id="btnLogin">Entrar</button>
+    <button id="btnCadastrar">Cadastrar-se</button>
+
+    <div id="msg"></div>
+
+    <script>
+      const BASE_URL = "http://127.0.0.1:8000";
+
+      async function login(email, senha) {
+        try {
+          const resposta = await fetch(`${BASE_URL}/auth/login`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: email,
+              senha: senha,
+            }),
+          });
+
+          if (!resposta.ok) {
+            const erro = await resposta.json();
+            throw new Error(erro.detail || "Erro ao fazer login");
+          }
+
+          const dados = await resposta.json();
+          localStorage.setItem("token", dados.access_token);
+          mostrarMensagem("Login realizado com sucesso!", "green");
+
+          setTimeout(() => {
+            window.location.href = "site_dados.html";
+          }, 1500);
+        } catch (erro) {
+          mostrarMensagem(erro.message, "red");
+        }
+      }
+
+      function mostrarMensagem(msg, cor) {
+        const divMsg = document.querySelector("#msg");
+        divMsg.textContent = msg;
+        divMsg.style.color = cor;
+      }
+
+      document.querySelector("#btnLogin").addEventListener("click", () => {
+        const email = document.querySelector("#email").value.trim();
+        const senha = document.querySelector("#senha").value.trim();
+
+        if (!email || !senha) {
+          mostrarMensagem("Por favor, preencha email e senha.", "red");
+          return;
+        }
+
+        login(email, senha);
+      });
+
+      document.querySelector("#btnCadastrar").addEventListener("click", () => {
+        window.location.href = "site_cadastro.html";
+      });
+      
+  </script>
+</div>
+
+</body>
+
+</html>
